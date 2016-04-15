@@ -20,7 +20,7 @@ setwd("/Users/SKate_Shore/quant_methods/Quant-Methods-Project.git/Data")
 DMSP_June = read.csv("SAV15 Finalized Station DMS-P (Legs 1-3).csv", header = TRUE, fill = TRUE)
 CTD_June = read.csv("SAVCTDJUN2015ALLDATA.csv", header = TRUE, fill = TRUE)
 Pigs_June = read.csv("SAV JUN 15 Pig Extraction Log COMPLETE.csv", header = TRUE, fill = TRUE)
-Silica_June = read.csv("Silica Levels for 2015 Cruises.csv")
+Silica_June = read.csv("Silica Levels for 2015 Cruises.csv", header = TRUE, fill = TRUE)
 ```
 
 #Merge data sets. First create a unique id that corresponds with a row in the CTD data set. 
@@ -28,12 +28,14 @@ Silica_June = read.csv("Silica Levels for 2015 Cruises.csv")
 DMSP_June$id = paste(DMSP_June$Station, DMSP_June$Nisken.no, sep='_')
 CTD_June$id = paste(CTD_June$Station, CTD_June$Nisken.no, sep='_')
 Pigs_June$id = paste(Pigs_June$Station, Pigs_June$Nisken.no, sep='_')
+Silica_June$id = paste(Silica_June$Station, Silica_June$Nisken.no, sep='_')
 ```
 
 #Merge into a master data set by performing Inner Joins
 ```{r}
 DMSP_CTD = merge(DMSP_June, CTD_June, by="id", all=FALSE)
 DMSP_CTD = merge(DMSP_CTD, Pigs_June, by="id", all=FALSE)
+DMSP_CTD = merge(DMSP_CTD, Silica_June, by="id", all=FALSE)
 ```
 
 #Drop columns that contain inessential predictors
