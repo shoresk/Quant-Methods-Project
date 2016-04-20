@@ -7,8 +7,6 @@ output: pdf_document
 #What influences dimethylsulfoniopropionate (DMSP) produced in the South Atlantic Bight?
 #Sarah Kate Shore
 
-#Drop out Station 1, see if DMS and Pigments correlation improves
-
 #First, load package vegan:
 ```{r}
 library(vegan)
@@ -41,7 +39,7 @@ DMSP_CTD = merge(DMSP_CTD, Silica_June, by="id", all=FALSE)
 #Drop columns that contain inessential predictors
 ```{r}
 fields_to_drop = c('id', 'Station', 'Station.x', 'Station.y', 
-                   'X19.Hex.like.keto.Amount', 'Bot..Depth.m')
+                   'X19.Hex.like.keto.Amount', 'Bot..Depth.m', 'Nisken.no.y', "Latitude", 'Longitude', 'Depth', 'StrainGaugePressure', 'Conductivity', 'PotentialTemp.', 'Density', 'Sigmatheta', 'PAR.Irradiance', 'Nisken.no.x.1', 'HPLCSet.no', 'VialName', 'Extraction.Date', 'Vol.Filtered.L', 'Nisken.no.y.1')
 DMSP_CTD_vars = DMSP_CTD[ , !(names(DMSP_CTD) %in% fields_to_drop)]
 rows_to_keep = which(apply(DMSP_CTD_vars, 1, function(x) !any(is.na(x))))
 DMSP_CTD_vars = DMSP_CTD_vars[rows_to_keep, ]
@@ -62,7 +60,8 @@ plot(pca, display='sp', choices = c(1,2))
 ```{r}
 ols_DMSPp = lm(DMSP_CTD_vars$DMSPp.nmol..L.1~ . , data = DMSP_CTD_vars)
 summary(ols_DMSPp)
-# 1 significant variable with p < 0.1, Lutein pigment at p = 0.0739
+# 2 significant variables with p < 0.1
+#Chl.a.like, a.Car
 ```
 
 #DMSPd vs. predictors model
@@ -72,21 +71,30 @@ plot(ols)
 abline(ols)
 abline(h=mean(DMSP_CTD_vars$DMSPd.nmolL.1), col='pink', lwd=2)
 legend('topleft', c('OLS fit', 'mean'), col=c('black', 'pink'), lty=1, lwd=c(1,2))
-```
-
-#Explore DMSPd model
-```{r}
 summary(ols)
-install.packages('car') #Not working? Do I need to update my RStudio?
-library('car')
-Anova(ols, type = 3)
-# 1 significant variable (p = 0.0451 for Zeax. pigment)
+# 12 significant variables with p < 0.1, 8 with p < 0.05
+#Salinity, Oxygen.1, Peridinin, Diato, Monad, Ph.tin, Silica
 ```
 
 #DMS vs. predictors model
 ```{r}
 ols_DMS = lm(DMSP_CTD_vars$DMS.nmol.L.1~ . , data = DMSP_CTD_vars)
 summary(ols_DMS)
-#11 variables of at least <.1 significance, 7 of <0.05 significance
+#19 variables of at least p < 0.1 significance, 11 with p < 0.05 significance
+#Lat, Long, Salinity, Peridinin, cis.fuco, Diato, Monad., Chl.b, Chl.a, b.Car
 ```
 
+#DMS vs. Salinity
+```{r}
+plot(DMSP_CTD_vars$DMS.nmol.L.1 ~ DMSP_CTD_vars$Salinity, col = 66, main = 'DMS vs. Salinity')
+```
+
+#DMS vs. Depth
+```{r}
+plot(DMSP_CTD_vars$DMS.nmol.L.1 ~ DMSP_CTD_vars$Depth.m, col = 54, main = 'DMS vs. Depth')
+```
+
+#DMS vs. Temperature
+```{r}
+plot(DMSP_CTD_vars$DMS.nmol.L.1 ~ DMSP_CTD_vars$Temperature, col = 420, main = 'DMS vs. Temperature')
+```
